@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
 
-  let apiUrl = localStorage.getItem("freevpc_api_url") || "https://api.unsafie.com";
+  let apiUrl = localStorage.getItem("freevpc_api_url") || window.location.origin;
   let clientId = localStorage.getItem("freevpc_client_id") || "5a06f20e534be12f4e259e932af57b57.access";
   let clientSecret = localStorage.getItem("freevpc_client_secret") || "cfast_clJJ6Rx6HA0bdn2eXV31EO7UNnApjsLaOOdkWCMe71e2052a";
 
@@ -45,7 +45,7 @@
     loading = true;
     error = null;
     try {
-      const data = await apiRequest("/status");
+      const data = await apiRequest("/api/status");
       if (data) statusData = data;
     } catch (e) {
       error = e.message;
@@ -67,7 +67,7 @@
         image: newVm.image,
         ssh_keys: newVm.ssh_key ? [newVm.ssh_key] : []
       };
-      await apiRequest("/v1/vms", { method: "POST", body: JSON.stringify(payload) });
+      await apiRequest("/api/vm", { method: "POST", body: JSON.stringify(payload) });
       showDeployModal = false;
       newVm.name = "";
       await refreshData();
@@ -82,7 +82,7 @@
     if (!confirm(`Are you sure you want to terminate micro-VM "${name}"?`)) return;
     loading = true;
     try {
-      await apiRequest(`/v1/vms/${id}`, { method: "DELETE" });
+      await apiRequest(`/api/vm/${id}`, { method: "DELETE" });
       await refreshData();
     } catch (e) {
       alert(`Delete failed: ${e.message}`);
@@ -94,7 +94,7 @@
   async function triggerBatchSpawn() {
     loading = true;
     try {
-      await apiRequest("/spawn", { method: "POST" });
+      await apiRequest("/api/spawn", { method: "POST" });
       await refreshData();
     } catch (e) {
       alert(`Spawn failed: ${e.message}`);
